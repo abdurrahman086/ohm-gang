@@ -1,0 +1,11 @@
+# Supabase CLI config — remote project
+project_id = "yvqhglgtzerutluljxct"
+
+[auth]
+enable_signup = false
+
+[functions.create-member-account]
+verify_jwt = true
+
+[functions.manage-member-accounts]
+verify_jwt = true

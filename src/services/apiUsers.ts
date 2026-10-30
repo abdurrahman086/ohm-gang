@@ -32,11 +32,20 @@ export async function fetchProfiles(): Promise<UserProfile[]> {
   return (data ?? []).map((profile) => ({ ...profile, bio: null, interests: null, achievements: null, student_id_number: null, phone_number: null })) as UserProfile[];
 }
 
-/** Siswa yang pembayarannya sudah disetujui pada periode tersebut. */
+/** Siswa lunas: pembayaran approved + bypass approved. */
 export async function fetchPaidUserIds(periodId: string): Promise<Set<string>> {
   if (!periodId) return new Set();
-  const { data, error } = await requireSupabase().from('cash_transactions')
-    .select('user_id').eq('period_id', periodId).eq('type', 'income').eq('status', 'approved');
-  if (error) throw error;
-  return new Set((data ?? []).map(({ user_id }) => user_id));
+  const sb = requireSupabase();
+  const [payments, waivers] = await Promise.all([
+    sb.from('cash_transactions')
+      .select('user_id').eq('period_id', periodId).eq('type', 'income').eq('status', 'approved'),
+    sb.from('cash_payment_waivers')
+      .select('user_id').eq('period_id', periodId).eq('status', 'approved'),
+  ]);
+  if (payments.error) throw payments.error;
+  if (waivers.error) throw waivers.error;
+  return new Set([
+    ...(payments.data ?? []).map(({ user_id }) => user_id),
+    ...(waivers.data ?? []).map(({ user_id }) => user_id),
+  ]);
 }

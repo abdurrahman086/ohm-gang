@@ -3,11 +3,11 @@ import { fetchTransactions, type TransactionFilters, type CashTransactionView } 
 import { isSupabaseConfigured } from '@/config/supabase';
 
 // Transaksi kas untuk dashboard & landing.
-export function useTransactions(filters: TransactionFilters = {}) {
+export function useTransactions(filters: TransactionFilters = {}, enabled = true) {
   return useQuery<CashTransactionView[]>({
     queryKey: ['transactions', filters],
     queryFn: () => fetchTransactions(filters),
-    enabled: isSupabaseConfigured,
+    enabled: isSupabaseConfigured && enabled,
     staleTime: 0,
     gcTime: 0,
   });

@@ -16,8 +16,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ConfirmDialog, type ConfirmTone } from '@/components/common/ConfirmDialog';
 import { Loader } from '@/components/common/Loader';
 import { ProofModal } from '@/components/dashboard/ProofModal';
-import { TransactionTable } from '@/components/dashboard/TransactionTable';
+import { PaymentRosterTable } from '@/components/dashboard/PaymentRosterTable';
 import { useAuth } from '@/hooks/useAuth';
+import { can } from '@/config/permissions';
 import { useProfiles } from '@/hooks/useProfiles';
 import { useTransactions } from '@/hooks/useTransactions';
 import { usePeriods } from '@/hooks/usePeriods';
@@ -31,7 +32,7 @@ import { cn } from '@/lib/utils';
 
 // Manajemen Kas (PRD §4.2): verifikasi PENDING, catat pengeluaran, tunggakan, buku kas.
 export function FinanceManager() {
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const queryClient = useQueryClient();
   const [cashUserId, setCashUserId] = useState('');
   const [cashPeriodId, setCashPeriodId] = useState('');
@@ -41,7 +42,6 @@ export function FinanceManager() {
   const selectedPeriodId = cashPeriodId || currentPeriod?.id || '';
   const { data: paidIds } = usePaidUserIds(selectedPeriodId);
   const { data: pending, isLoading: loadingPending } = useTransactions({ status: 'pending' });
-  const { data: allTx, isLoading: loadingAll } = useTransactions();
 
   const [proofPath, setProofPath] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -248,8 +248,15 @@ export function FinanceManager() {
             </CardContent>
           </Card>
 
-          {/* Buku Kas Digital */}
-          <TransactionTable transactions={allTx} getName={getName} isLoading={loadingAll} />
+          {/* Daftar pembayaran per periode (buku kas ada di Ringkasan) */}
+          <PaymentRosterTable
+            periodId={selectedPeriodId}
+            periods={periods ?? []}
+            profiles={profiles ?? []}
+            onPeriodChange={setCashPeriodId}
+            getName={getName}
+            canRequestWaiver={can(role, 'requestWaiver')}
+          />
         </div>
 
         {/* Sidebar kanan: Form aksi */}

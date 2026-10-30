@@ -137,6 +137,14 @@ export async function submitPayment(input: {
   note?: string;
 }): Promise<void> {
   const sb = requireSupabase();
+  const { data: period, error: periodError } = await sb
+    .from('cash_periods')
+    .select('id,is_active')
+    .eq('id', input.periodId)
+    .maybeSingle();
+  if (periodError) throw periodError;
+  if (!period?.is_active) throw new Error('Periode kas tidak aktif. Upload bukti ditutup.');
+
   const { error } = await sb
     .from('cash_transactions')
     .insert({

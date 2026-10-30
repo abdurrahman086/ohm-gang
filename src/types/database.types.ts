@@ -237,6 +237,74 @@ export type Database = {
           },
         ]
       }
+      cash_payment_waivers: {
+        Row: {
+          approved_by: string | null
+          created_at: string
+          id: string
+          period_id: string
+          reason: string
+          rejection_reason: string | null
+          requested_by: string
+          status: Database["public"]["Enums"]["payment_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          period_id: string
+          reason: string
+          rejection_reason?: string | null
+          requested_by: string
+          status?: Database["public"]["Enums"]["payment_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          period_id?: string
+          reason?: string
+          rejection_reason?: string | null
+          requested_by?: string
+          status?: Database["public"]["Enums"]["payment_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cash_payment_waivers_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cash_payment_waivers_period_id_fkey"
+            columns: ["period_id"]
+            isOneToOne: false
+            referencedRelation: "cash_periods"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cash_payment_waivers_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cash_payment_waivers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       challenge_submissions: {
         Row: {
           attachment_url: string | null
@@ -682,11 +750,19 @@ export type Database = {
         Returns: boolean
       }
       is_officer: { Args: never; Returns: boolean }
+      request_payment_waiver: {
+        Args: { p_period_id: string; p_reason: string; p_user_id: string }
+        Returns: string
+      }
       reject_fund_request: {
         Args: { p_reason: string; p_request_id: string }
         Returns: undefined
       }
       set_active_period: { Args: { p_period_id: string }; Returns: undefined }
+      verify_payment_waiver: {
+        Args: { p_approve: boolean; p_reason?: string; p_waiver_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       idea_category: "ide" | "karya" | "proyek"

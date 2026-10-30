@@ -17,7 +17,10 @@ export function RequireRole({ action, children }: RequireRoleProps) {
   const { user, role, authReady } = useAuth();
   const location = useLocation();
 
-  if (!authReady) {
+  // Keep rendering an already-loaded profile while auth refreshes in background.
+  // Supabase can emit TOKEN_REFRESHED after the profile is available; waiting for
+  // authReady unconditionally leaves protected pages stuck on this skeleton.
+  if (!user && !authReady) {
     return (
       <div className="flex justify-center py-24">
         <Loader className="h-40 w-64" />

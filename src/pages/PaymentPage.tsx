@@ -8,6 +8,7 @@ import { Loader } from '@/components/common/Loader';
 import { useAuth } from '@/hooks/useAuth';
 import { usePeriods } from '@/hooks/usePeriods';
 import { useTransactions } from '@/hooks/useTransactions';
+import { useWaivers } from '@/hooks/useWaivers';
 import { submitPayment } from '@/services/apiCash';
 import { uploadProof, validateProofFile } from '@/services/apiStorage';
 import { formatCurrency } from '@/utils/formatCurrency';
@@ -30,7 +31,11 @@ export function PaymentPage() {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const selectedPeriod = periods?.find((p) => p.id === periodId) ?? periods?.[0];
+  const activePeriods = useMemo(() => (periods ?? []).filter((p) => p.is_active), [periods]);
+  const selectedPeriod = activePeriods.find((p) => p.id === periodId) ?? activePeriods[0];
+  const { data: periodWaivers } = useWaivers(selectedPeriod?.id);
+  const myWaiver = periodWaivers?.find((waiver) => waiver.user_id === user?.id && waiver.status !== 'rejected');
+  const waiverBlocked = Boolean(myWaiver);
 
   const history = useMemo(
     () =>
@@ -54,6 +59,14 @@ export function PaymentPage() {
     e.preventDefault();
     setError(null);
     if (!user || !selectedPeriod) return;
+    if (!selectedPeriod.is_active) {
+      setError('Periode kas tidak aktif. Upload bukti ditutup.');
+      return;
+    }
+    if (waiverBlocked) {
+      setError('Status kas periode ini sudah ditetapkan pengurus. Upload bukti tidak diperlukan.');
+      return;
+    }
     if (activePayment) {
       setError('Pembayaran untuk periode ini sudah dikirim atau disetujui.');
       return;
@@ -136,18 +149,32 @@ export function PaymentPage() {
                   >
                     {loadingPeriods ? (
                       <option>Memuat periode…</option>
+                    ) : activePeriods.length === 0 ? (
+                      <option value="">Tidak ada periode aktif</option>
                     ) : (
-                      (periods ?? []).map((p) => (
+                      activePeriods.map((p) => (
                         <option key={p.id} value={p.id}>
                           {p.title} · {formatCurrency(Number(p.amount))}
                         </option>
                       ))
                     )}
                   </select>
+                  {!loadingPeriods && activePeriods.length === 0 && (
+                    <p className="mt-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">
+                      Tidak ada periode aktif. Upload bukti pembayaran ditutup sampai pengurus mengaktifkan periode.
+                    </p>
+                  )}
                 </div>
 
                 {qrisPath ? <img src={qrisPublicUrl(qrisPath)} alt="QRIS pembayaran kas kelas" className="mx-auto max-h-72 rounded-xl border border-slate-200 object-contain" /> : <p className="rounded-xl bg-amber-50 p-4 text-sm text-amber-800">QRIS belum diatur pengurus kelas.</p>}
                 {activePayment && <p className="rounded-xl bg-slate-50 p-4 text-sm text-textSecondary">Pembayaran periode ini berstatus {activePayment.status === 'approved' ? 'lunas' : 'menunggu verifikasi'}.</p>}
+                {myWaiver && (
+                  <p className="rounded-xl bg-slate-50 p-4 text-sm text-textSecondary">
+                    {myWaiver.status === 'approved'
+                      ? 'Kamu sudah tercatat lunas untuk periode ini.'
+                      : 'Bypass lunas periode ini sedang menunggu verifikasi wali kelas.'}
+                  </p>
+                )}
 
                 <div>
                   <label className={labelCls}>Unggah bukti pembayaran QRIS</label>
@@ -175,7 +202,7 @@ export function PaymentPage() {
 
                 {error && <p className="text-sm text-rose-600">{error}</p>}
 
-                <Button type="submit" className="w-full" size="lg" disabled={submitting || !selectedPeriod || !qrisPath || !!activePayment}>
+                <Button type="submit" className="w-full" size="lg" disabled={submitting || !selectedPeriod || !qrisPath || !!activePayment || waiverBlocked}>
                   {submitting ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" /> Mengirim…

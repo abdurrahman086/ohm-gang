@@ -1,5 +1,5 @@
 import { NavLink, Link } from 'react-router-dom';
-import { LayoutDashboard, Landmark, FileText, LogOut, QrCode, UserPlus, Users, CalendarDays } from 'lucide-react';
+import { LayoutDashboard, Landmark, FileText, LogOut, QrCode, UserPlus, Users, CalendarDays, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { can, type PermissionAction } from '@/config/permissions';
@@ -10,6 +10,7 @@ const menu: Array<{ to: string; label: string; icon: typeof LayoutDashboard; act
   { to: '/dashboard/keuangan', label: 'Manajemen Kas', icon: Landmark, action: 'verifyPayments' },
   { to: '/dashboard/periode', label: 'Periode Kas', icon: CalendarDays, action: 'managePeriods' },
   { to: '/dashboard/pengajuan', label: 'Pengajuan Dana', icon: FileText, action: 'viewFundRequests' },
+  { to: '/dashboard/bypass', label: 'Verifikasi Bypass', icon: ShieldCheck, action: 'verifyWaivers' },
   { to: '/dashboard/qris', label: 'Kelola QRIS', icon: QrCode, action: 'manageQris' },
   { to: '/dashboard/pengguna-baru', label: 'Buat Akun Siswa', icon: UserPlus, action: 'manageUsers' },
   { to: '/dashboard/pengguna', label: 'Kelola Pengguna', icon: Users, action: 'manageUsers' },

@@ -9,6 +9,8 @@ export type PermissionAction =
   | 'uploadPayment' // upload bukti bayar
   | 'viewOwnPaymentStatus' // lihat status kas pribadi
   | 'verifyPayments' // verifikasi/tolak pembayaran
+  | 'requestWaiver' // ajukan bypass lunas (data lama)
+  | 'verifyWaivers' // verifikasi bypass lunas
   | 'manageQris' // kelola QRIS
   | 'recordExpense' // catat pengeluaran
   | 'manageHealthIndicator' // kelola indikator kesehatan
@@ -23,7 +25,9 @@ const ROLE_ACTIONS: Record<PermissionAction, Role[]> = {
   viewLanding: ['member', 'keuangan', 'wali_kelas', 'developer'],
   uploadPayment: ['member'],
   viewOwnPaymentStatus: ['member'],
-  verifyPayments: ['keuangan'],
+  verifyPayments: ['keuangan', 'wali_kelas', 'developer'],
+  requestWaiver: ['keuangan', 'wali_kelas', 'developer'],
+  verifyWaivers: ['wali_kelas', 'developer'],
   manageQris: ['keuangan', 'wali_kelas'],
   recordExpense: ['keuangan'],
   manageHealthIndicator: ['keuangan'],

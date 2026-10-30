@@ -8,6 +8,7 @@ import { Overview } from '@/pages/dashboard/Overview';
 import { FinanceManager } from '@/pages/dashboard/FinanceManager';
 import { PeriodManager } from '@/pages/dashboard/PeriodManager';
 import { FundRequests } from '@/pages/dashboard/FundRequests';
+import { WaiverApprovals } from '@/pages/dashboard/WaiverApprovals';
 import { QrisSettings } from '@/pages/dashboard/QrisSettings';
 import { CreateMemberPage } from '@/pages/dashboard/CreateMemberPage';
 import { ManageUsersPage } from '@/pages/dashboard/ManageUsersPage';
@@ -16,6 +17,7 @@ import { NotFoundPage } from '@/pages/NotFoundPage';
 import { InstallPWA } from '@/components/pwa/InstallPWA';
 import { ReloadPrompt } from '@/components/pwa/ReloadPrompt';
 import { RealtimeCashSync } from '@/components/common/RealtimeCashSync';
+import { RequireRole } from '@/components/common/RequireRole';
 
 export default function App() {
   return (
@@ -31,9 +33,10 @@ export default function App() {
         <Route path="dashboard" element={<DashboardLayout />}>
           <Route index element={<Overview />} />
           <Route path="bayar" element={<PaymentPage />} />
-          <Route path="keuangan" element={<FinanceManager />} />
+          <Route path="keuangan" element={<RequireRole action="verifyPayments"><FinanceManager /></RequireRole>} />
           <Route path="periode" element={<PeriodManager />} />
           <Route path="pengajuan" element={<FundRequests />} />
+          <Route path="bypass" element={<RequireRole action="verifyWaivers"><WaiverApprovals /></RequireRole>} />
           <Route path="qris" element={<QrisSettings />} />
           <Route path="pengguna-baru" element={<CreateMemberPage />} />
           <Route path="pengguna" element={<ManageUsersPage />} />

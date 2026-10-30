@@ -1,6 +1,7 @@
 import { NavLink, Link } from 'react-router-dom';
-import { LayoutDashboard, Landmark, FileText, LogOut, QrCode, UserPlus, Users, CalendarDays, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, Landmark, FileText, LogOut, QrCode, Users, CalendarDays, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Loader } from '@/components/common/Loader';
 import { useAuth } from '@/hooks/useAuth';
 import { can, type PermissionAction } from '@/config/permissions';
 
@@ -12,12 +13,17 @@ const menu: Array<{ to: string; label: string; icon: typeof LayoutDashboard; act
   { to: '/dashboard/pengajuan', label: 'Pengajuan Dana', icon: FileText, action: 'viewFundRequests' },
   { to: '/dashboard/bypass', label: 'Verifikasi Bypass', icon: ShieldCheck, action: 'verifyWaivers' },
   { to: '/dashboard/qris', label: 'Kelola QRIS', icon: QrCode, action: 'manageQris' },
-  { to: '/dashboard/pengguna-baru', label: 'Buat Akun Siswa', icon: UserPlus, action: 'manageUsers' },
-  { to: '/dashboard/pengguna', label: 'Kelola Pengguna', icon: Users, action: 'manageUsers' },
+  { to: '/dashboard/pengguna', label: 'Kelola Akun', icon: Users, action: 'manageUsers' },
 ];
 
 export function Sidebar() {
-  const { signOut, user, role } = useAuth();
+  const { signOut, user, role, authReady } = useAuth();
+
+  if (!authReady) {
+    return (
+      <div className="flex justify-center py-24"><Loader className="h-40 w-64" /></div>
+    );
+  }
 
   const visible = menu.filter((m) => can(role, m.action));
 

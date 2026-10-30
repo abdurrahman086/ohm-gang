@@ -31,7 +31,13 @@ Deno.serve(async (request) => {
   let body: unknown;
   try { body = await request.json(); } catch { return json({ error: 'Invalid request body' }, 400); }
   if (!body || typeof body !== 'object' || Array.isArray(body)) return json({ error: 'Invalid request body' }, 400);
-  const input = body as { action?: unknown; userId?: unknown; email?: unknown };
+  const input = body as {
+    action?: unknown;
+    userId?: unknown;
+    email?: unknown;
+    fullName?: unknown;
+    phoneNumber?: unknown;
+  };
   const admin = createClient(url, serviceRoleKey, { auth: { autoRefreshToken: false, persistSession: false } });
 
   if (input.action === 'list') {
@@ -42,7 +48,7 @@ Deno.serve(async (request) => {
       authUsers.push(...data.users);
       if (data.users.length < 1000) break;
     }
-    const { data: profiles, error } = await admin.from('profiles').select('id,full_name,role').order('full_name');
+    const { data: profiles, error } = await admin.from('profiles').select('id,full_name,role,phone_number').order('full_name');
     if (error) return json({ error: 'Unable to load user profiles' }, 500);
     const emailById = new Map(authUsers.map((account) => [account.id, account.email ?? '']));
     return json({ users: (profiles ?? []).map((profile) => ({ ...profile, email: emailById.get(profile.id) ?? '' })) });
@@ -60,6 +66,35 @@ Deno.serve(async (request) => {
     }
     const { error } = await admin.auth.admin.updateUserById(userId, { email });
     if (error) return json({ error: error.message }, 400);
+    return json({ ok: true });
+  }
+
+  if (input.action === 'update_profile') {
+    const userId = typeof input.userId === 'string' ? input.userId : '';
+    const email = typeof input.email === 'string' ? input.email.trim().toLowerCase() : '';
+    const fullName = typeof input.fullName === 'string' ? input.fullName.trim() : '';
+    const phoneNumber = typeof input.phoneNumber === 'string' ? input.phoneNumber.trim() : '';
+    if (!userId || !email || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return json({ error: 'Provide a valid user ID and email address' }, 400);
+    }
+    if (!fullName || fullName.length > 100 || phoneNumber.length > 32) {
+      return json({ error: 'Nama wajib diisi (maksimal 100 karakter); nomor telepon maksimal 32 karakter' }, 400);
+    }
+    const { data: target, error: targetError } = await admin.from('profiles').select('role').eq('id', userId).maybeSingle();
+    if (targetError || !target || !['member', 'keuangan'].includes(target.role)) {
+      return json({ error: 'Only member and bendahara accounts can be updated' }, 403);
+    }
+
+    // Wali class is authorized above; migration 0022 permits service-role updates
+    // to these two profile fields while keeping role/ID/avatar developer-only.
+    const { error: profileError } = await admin.from('profiles').update({
+      full_name: fullName,
+      phone_number: phoneNumber || null,
+    }).eq('id', userId);
+    if (profileError) return json({ error: profileError.message }, 400);
+
+    const { error: emailError } = await admin.auth.admin.updateUserById(userId, { email });
+    if (emailError) return json({ error: `Profil diperbarui, tetapi email gagal diperbarui: ${emailError.message}` }, 400);
     return json({ ok: true });
   }
 

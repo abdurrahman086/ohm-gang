@@ -10,8 +10,7 @@ import { PeriodManager } from '@/pages/dashboard/PeriodManager';
 import { FundRequests } from '@/pages/dashboard/FundRequests';
 import { WaiverApprovals } from '@/pages/dashboard/WaiverApprovals';
 import { QrisSettings } from '@/pages/dashboard/QrisSettings';
-import { CreateMemberPage } from '@/pages/dashboard/CreateMemberPage';
-import { ManageUsersPage } from '@/pages/dashboard/ManageUsersPage';
+import { UserManagementPage } from '@/pages/dashboard/UserManagementPage';
 import { PasswordResetPage } from '@/pages/PasswordResetPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { InstallPWA } from '@/components/pwa/InstallPWA';
@@ -38,8 +37,8 @@ export default function App() {
           <Route path="pengajuan" element={<FundRequests />} />
           <Route path="bypass" element={<RequireRole action="verifyWaivers"><WaiverApprovals /></RequireRole>} />
           <Route path="qris" element={<QrisSettings />} />
-          <Route path="pengguna-baru" element={<CreateMemberPage />} />
-          <Route path="pengguna" element={<ManageUsersPage />} />
+          <Route path="pengguna-baru" element={<UserManagementPage />} />
+          <Route path="pengguna" element={<UserManagementPage />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />

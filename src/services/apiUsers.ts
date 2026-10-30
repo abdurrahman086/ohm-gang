@@ -2,7 +2,10 @@ import { requireSupabase } from '@/config/supabase';
 import type { Database } from '@/types/database.types';
 
 export type UserProfile = Database['public']['Tables']['profiles']['Row'];
-export type ManagedUser = Pick<UserProfile, 'id' | 'full_name' | 'role'> & { email: string };
+export type ManagedUser = Pick<UserProfile, 'id' | 'full_name' | 'role'> & {
+  email: string;
+  phone_number: string | null;
+};
 
 export async function fetchManagedUsers(): Promise<ManagedUser[]> {
   const { data, error } = await requireSupabase().functions.invoke('manage-member-accounts', { body: { action: 'list' } });
@@ -10,11 +13,28 @@ export async function fetchManagedUsers(): Promise<ManagedUser[]> {
   return (data.users ?? []) as ManagedUser[];
 }
 
-export async function updateManagedUserEmail(userId: string, email: string): Promise<void> {
+export async function updateManagedUser(userId: string, updates: Pick<ManagedUser, 'email' | 'full_name' | 'phone_number'>): Promise<void> {
   const { error } = await requireSupabase().functions.invoke('manage-member-accounts', {
-    body: { action: 'update_email', userId, email },
+    body: {
+      action: 'update_profile',
+      userId,
+      email: updates.email,
+      fullName: updates.full_name,
+      phoneNumber: updates.phone_number,
+    },
   });
-  if (error) throw error;
+  if (error) {
+    const context = 'context' in error ? error.context : null;
+    if (context instanceof Response) {
+      let message = '';
+      try {
+        const body = await context.clone().json() as { error?: unknown };
+        if (typeof body.error === 'string') message = body.error;
+      } catch { /* Fall back to Supabase's function error. */ }
+      if (message) throw new Error(message);
+    }
+    throw error;
+  }
 }
 
 export async function sendPasswordRecovery(email: string): Promise<void> {

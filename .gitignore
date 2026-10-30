@@ -34,3 +34,5 @@ product_requirement_document.md
 system_architecture_document.md
 ui_ux_design_guidelines.md
 DEVELOPMENT_PLAN.md
+.vercel
+.env*

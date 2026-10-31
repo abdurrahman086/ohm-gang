@@ -30,7 +30,8 @@
     @apply border-border;
   }
 
-  html {
+  html, body, #root {
+    @apply bg-bgCanvas;
     -webkit-tap-highlight-color: transparent;
     @apply scroll-smooth;
   }

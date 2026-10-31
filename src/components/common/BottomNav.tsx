@@ -29,7 +29,7 @@ export function BottomNav() {
             end={m.end}
             className={({ isActive }) =>
               cn(
-                'flex min-w-[48px] flex-1 flex-col items-center justify-center gap-0.5 rounded-lg px-1 py-2 text-[10px] font-medium transition-colors',
+                'flex min-w-[48px] flex-1 flex-col items-center justify-center gap-0.5 rounded-lg px-1 py-2 text-[10px] font-medium transition-none',
                 isActive
                   ? 'bg-primary-50 text-primary-600'
                   : 'text-textSecondary hover:bg-slate-50'

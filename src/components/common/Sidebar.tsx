@@ -21,7 +21,16 @@ export function Sidebar() {
 
   if (!authReady) {
     return (
-      <div className="flex justify-center py-24"><Loader className="h-40 w-64" /></div>
+      <aside className="hidden w-60 shrink-0 flex-col justify-between border-r border-slate-100 bg-cardBg lg:sticky lg:top-0 lg:flex lg:h-screen">
+        <div className="flex h-16 items-center border-b border-slate-100 px-5">
+          <Loader className="h-6 w-32 rounded-lg" />
+        </div>
+        <div className="flex-1 space-y-3 p-4">
+          <Loader className="h-9 w-full rounded-xl" />
+          <Loader className="h-9 w-full rounded-xl" />
+          <Loader className="h-9 w-full rounded-xl" />
+        </div>
+      </aside>
     );
   }
 
@@ -43,7 +52,7 @@ export function Sidebar() {
               end={item.end}
               className={({ isActive }) =>
                 cn(
-                  'flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-textSecondary transition-colors hover:bg-slate-50 hover:text-primary-600',
+                  'flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-textSecondary hover:bg-slate-50 hover:text-primary-600',
                   isActive && 'bg-primary-50 text-primary-600',
                 )
               }

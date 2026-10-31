@@ -1,10 +1,9 @@
 import { Outlet, Link } from 'react-router-dom';
-import { LogOut, Zap } from 'lucide-react';
 import { Sidebar } from '@/components/common/Sidebar';
 import { BottomNav } from '@/components/common/BottomNav';
 import { useAuth } from '@/hooks/useAuth';
+import { LogOut, Zap } from 'lucide-react';
 
-// Layout terautentikasi untuk role pengurus (Fase 3: guard per role).
 export function DashboardLayout() {
   const { signOut } = useAuth();
 
@@ -30,8 +29,8 @@ export function DashboardLayout() {
           </button>
         </header>
 
-        <main className="flex-1 p-4 pb-24 sm:p-6 lg:p-8 lg:pb-8">
-          <div className="mx-auto max-w-5xl">
+        <main className="relative flex-1 overflow-x-hidden p-4 pb-24 sm:p-6 lg:overflow-y-scroll lg:p-8 lg:pb-8">
+          <div className="mx-auto max-w-5xl min-h-[400px]">
             <Outlet />
           </div>
         </main>

@@ -110,7 +110,7 @@ export function FundRequests() {
         <h1 className="text-2xl font-bold text-textPrimary">Pengajuan Dana</h1>
         <p className="mt-1 text-sm text-textSecondary">
           ≤ {formatCurrency(FUND_LARGE_THRESHOLD)} cukup disetujui Bagian Keuangan · lebih dari itu butuh Wali Kelas{' '}
-          <span className="font-semibold">dan</span> Bagian Keuangan (PRD §4.2.D)
+          <span className="font-semibold">dan</span> Bagian Keuangan.
         </p>
       </div>
 

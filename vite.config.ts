@@ -23,8 +23,8 @@ export default defineConfig({
         name: 'OHM-Gang — Keuangan Kelas TITL',
         short_name: 'OHM-Gang',
         description: 'OHM-Gang — pembayaran kas dan pencatatan keuangan kelas',
-        theme_color: '#F4F7FE',
-        background_color: '#FFFFFF',
+        theme_color: '#3B82F6',
+        background_color: '#F8FAFC',
         display: 'standalone',
         orientation: 'portrait',
         icons: [
